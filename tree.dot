@@ -1,0 +1,15 @@
+digraph DotGraph
+{
+    Node0 [shape="ellipse", color="black", fontcolor="black", fillcolor="#FFFFFF", style="filled", weight="1", label="10"];
+    Node1 [shape="ellipse", color="black", fontcolor="black", fillcolor="#FFFFFF", style="filled", weight="1", label="5"];
+    Node2 [shape="ellipse", color="black", fontcolor="black", fillcolor="#FFFFFF", style="filled", weight="1", label="15"];
+    Node3 [shape="ellipse", color="black", fontcolor="black", fillcolor="#FFFFFF", style="filled", weight="1", label="12"];
+    Node4 [shape="ellipse", color="black", fontcolor="black", fillcolor="#FFFFFF", style="filled", weight="1", label="20"];
+    Node5 [shape="ellipse", color="black", fontcolor="black", fillcolor="#FFFFFF", style="filled", weight="1", label="11"];
+
+    Node0 -> Node1 [color="#000000", style="bold", weight="1", label=""];
+    Node0 -> Node2 [color="#000000", style="bold", weight="1", label=""];
+    Node2 -> Node3 [color="#000000", style="bold", weight="1", label=""];
+    Node2 -> Node4 [color="#000000", style="bold", weight="1", label=""];
+    Node3 -> Node5 [color="#000000", style="bold", weight="1", label=""];
+}

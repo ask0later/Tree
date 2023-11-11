@@ -1,0 +1,10 @@
+digraph DotGraph
+{
+    Node1 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="filled", weight="1", label="10"];
+    Node3 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="filled", weight="1", label="7"];
+    Node1 -> Node3 [color="black", style="solid", weight="1", label=""];
+    Node4 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="filled", weight="1", label="15"];
+    Node10 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="filled", weight="1", label="20"];
+    Node4 -> Node10 [color="black", style="solid", weight="1", label=""];
+    Node1 -> Node4 [color="black", style="solid", weight="1", label=""];
+}
