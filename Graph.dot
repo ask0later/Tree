@@ -6,7 +6,5 @@ digraph DotGraph
     Node3 -> Node7 [color="black", style="solid", weight="1", label=""];
     Node1 -> Node3 [color="black", style="solid", weight="1", label=""];
     Node4 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="40"];
-    Node9 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="5"];
-    Node4 -> Node9 [color="black", style="solid", weight="1", label=""];
     Node1 -> Node4 [color="black", style="solid", weight="1", label=""];
 }

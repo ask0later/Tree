@@ -12,10 +12,15 @@ int main()
     Constructor(&tree);
 
 
-    ReadTree(&tree.root, From, PRE_ORDER);
-
+    Error error = ReadTree(&tree.root, From, PRE_ORDER);
+    if (error != NO_ERROR)
+    {
+        DumpErrors(error);
+        Destructor(&tree);
+        return 1;
+    }
     // tree.root->right->left = tree.root->left->left;
-    Error error = CheckNoLoop(&tree);
+    error = CheckNoLoop(&tree);
     if (error != NO_ERROR)
     {
         DumpErrors(error);

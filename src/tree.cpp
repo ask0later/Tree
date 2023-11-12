@@ -105,6 +105,7 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
     if (strcmp(str, "(") == 0)
     {
         *node = New();
+        if (*node == NULL) {return ERROR_4;}
 
         if (order_value == PRE_ORDER)
         {
@@ -135,15 +136,12 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
         fscanf(From, "%s", str);
         if (strcmp(str, ")") != 0)
         {
-            printf("err1\n");
             return ERROR_1;
         }
     }
-    else
-    {
-        printf("err2\n");
+    else    
         return ERROR_2;
-    }
+
     return NO_ERROR;
 }
 
@@ -166,13 +164,15 @@ Error GraphicDump(Control* tree)
 
 Error CheckNoLoop(Control* tree)
 {
-    //               
-    Node* addresses[32] = {};
+    // 
+    if (2 * tree->size > MAX_SIZE_TREE) {return ERROR_5;}   
+
+    Node* addresses[MAX_SIZE_TREE] = {};
     //              ^_______ 2 tree.size
     NodeTraversal(tree->root, addresses, 0);
 
-    Qsort(addresses, 0, 31);
-    for (size_t i = 0; i < 30; i++)
+    Qsort(addresses, 0, MAX_SIZE_TREE - 1);
+    for (size_t i = 0; i < MAX_SIZE_TREE - 2; i++)
     {
         if ((addresses[i] == addresses[i + 1]) && (addresses[i] != NULL))
         {
@@ -271,19 +271,20 @@ void DumpErrors(Error error)
             return;
             break;
         case ERROR_1:
-            printf("error1: \n");
+            printf("error1: has not been detected ')'\n");
             break;
         case ERROR_2:
-            printf("error2: \n");
+            printf("error2: has not been detected '('\n");
             break;
         case ERROR_3:
             printf("error3: loop in tree\n");
             break;
         case ERROR_4:
-            printf("error4: \n");
+            printf("error4: memory allocation is fail\n");
             break;
         case ERROR_5:
-            printf("error5: \n");
+            printf("error5: address array has no memory for all addresses "
+            "(change the constant responsible for the maximum tree size) \n");
             break;
         case ERROR_6:
             printf("error6: \n");

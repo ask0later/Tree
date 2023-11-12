@@ -7,6 +7,8 @@
 #include <unistd.h>
 //#include "readfile.h"
 
+
+const size_t MAX_SIZE_TREE = 32;
 typedef int Elem_t;
 
 enum Order
