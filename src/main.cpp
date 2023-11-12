@@ -1,60 +1,53 @@
 #include "tree.h"
 //#include "readfile.h"
-const char* test = "testfile.txt";
+const char*  input =  "inputfile.txt";
+const char* output = "outputfile.txt";
 
 int main()
 {
     struct Control tree = {};
 
-    FILE* From = fopen(test, "r");
+    FILE* From = fopen(input, "r");
+    //FILE*   To = fopen(output, "w");
     Constructor(&tree);
 
 
-    InsertValue(&tree, 10);
-    TextDump(&tree);
+    ReadTree(&tree.root, From, PRE_ORDER);
 
-    InsertValue(&tree, 7);
-    TextDump(&tree);
+    // tree.root->right->left = tree.root->left->left;
+    Error error = CheckNoLoop(&tree);
+    if (error != NO_ERROR)
+    {
+        DumpErrors(error);
+        exit(1);
+    }
+    PrintNode(tree.root, stdout, PRE_ORDER);
 
-    InsertValue(&tree, 15);
-    TextDump(&tree);
-
-    InsertValue(&tree, 20);
-    TextDump(&tree);
-
-
-    // ReadTree(&tree.root, From, IN_ORDER);
-
-    //PrintNode(tree.root, stdout, IN_ORDER);
 
     GraphicDump(&tree);
     Destructor(&tree);
 
+    //fclose(To);
     fclose(From);
-
     return 0;
 }
 
 
-    // InsertValue(&tree, 10);
-    // TextDump(&tree);
+//     InsertValue(&tree, 20);
 
-    // InsertValue(&tree, 5);
-    // TextDump(&tree);
+//     InsertValue(&tree, 15);
 
-    // InsertValue(&tree, 15);
-    // TextDump(&tree);
+//     InsertValue(&tree, 40);
 
-    // InsertValue(&tree, 20);
-    // TextDump(&tree);
-
-    // InsertValue(&tree, 12);
-    // TextDump(&tree);
-
-    // InsertValue(&tree, 11);
-    // TextDump(&tree);
+//     InsertValue(&tree, 5);
 
 
-    // WriteToFile(&tree);
+//  ReadTree(&tree.root, From, POST_ORDER);
     
-    // GraphicDump(&tree);
+
+    // Error error = PrintNode(tree.root, stdout, POST_ORDER);
+    // if (error != NO_ERROR)
+    // {
+    //     DumpErrors(error);
+    //     Destructor(&tree);
+    // }

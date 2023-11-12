@@ -59,7 +59,17 @@ Error  PrintNode(Node* node, FILE*   To, Order order_value);
 Error ReadTree(Node** node, FILE* From, Order order_value);
 void WriteToFile(Control* tree);
 
+Error   CheckNoLoop(Control* tree);
+Error NodeTraversal(Node* node, Node* addresses[], size_t counter);
 
+
+Error Qsort(Node* addresses[], int first, int last);
+Error  Swap(Node* addresses[], int left, int right);
+
+
+
+
+void DumpErrors(Error error);
 
 
 #endif
