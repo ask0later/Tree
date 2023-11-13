@@ -9,32 +9,120 @@ const char* GRAPH_DOT  = "Graph.dot";
 Error Constructor(Control* tree)
 {
     assert(tree);
-    tree->size = 0;
+    
+    
+    tree->root = New();
+    if (tree->root == NULL) {return ERROR_4;}
+
+    memcpy(tree->root->data, "неизвестно кто", strlen("неизвестно кто"));
+    tree->size = 1;
+    //InputNodeData((tree->root), "неизвестно кто");
 
     return NO_ERROR;
 }
 
-Error InsertValue(Control* tree, Elem_t value)
+Error GuessObject(Control* tree, Node** node)
 {
-    Node** current = &tree->root;
+    char answer[MAX_SIZE_ARG] = {};
+    char*  str = {};
+    char*  str2 = {};    
+    
+    printf("Это %s?\n", (*node)->data);
+    scanf("%s", answer);
 
-    for (size_t counter = 0; counter < tree->size + 1; counter++)
+    if (strcmp(answer, "да") == 0)
     {
-        if (*current == NULL)
+        if ((*node)->left == NULL)
         {
-            *current = New();
-            (*current)->data = value; 
-            tree->size++;
+            printf("Похоже, я угадала!\n");
             return NO_ERROR;
         }
+        Error error = GuessObject(tree, &(*node)->left);
+        if (error != NO_ERROR)
+            return error;
+    }
+    else if (strcmp(answer, "нет") == 0)
+    {
+        if ((*node)->right == NULL)
+        {
+            printf("К сожалению я не знаю, что вы загадали, скажите что это...\n");
+
+            while (getchar() != '\n')   // clean buffer
+                ;
+            
+            (*node)->left = New();
+
+            if (((*node)->left) == NULL) {return ERROR_4;}
+
+            InputNodeData(&(*node)->left, str);
+            
+
+            (*node)->right = New();
+            if (((*node)->right) == NULL) {return ERROR_4;}
+
+            memcpy((*node)->right->data, (*node)->data, MAX_SIZE_ARG);
+    
+            printf("Чем %s отличается от %s\n", (*node)->left->data, (*node)->data);            
+
+            InputNodeData(node, str2);
         
-        if      (value <= (*current)->data)
-            current = &(*current)->left;
-        else if (value >  (*current)->data)
-            current = &(*current)->right;    
+            printf("Хорошо, я это запомню\n");
+        
+            tree->size++;
+
+            Error error = GuessObject(tree, &(tree->root));
+            if (error != NO_ERROR)
+                return error;
+        }
+        Error error = GuessObject(tree, &(*node)->right);
+        if (error != NO_ERROR)
+                return error;
+    }
+    else 
+    {
+        printf("Введите корректно\n");
+        Error error = GuessObject(tree, node);
+        if (error != NO_ERROR)
+                return error;
     }
     return NO_ERROR;
 }
+
+Error InputNodeData(Node** node, char* data)
+{
+    size_t arg = 0;
+    
+    memset((*node)->data, 0, MAX_SIZE_ARG);
+
+    getline(&data, &arg, stdin);
+    memcpy((*node)->data, data, strlen(data) - 1);
+    free(data);
+
+    return NO_ERROR;
+}
+
+
+// Error InsertValue(Control* tree, Elem_t value)
+// {
+//     Node** current = &tree->root;
+
+//     for (size_t counter = 0; counter < tree->size + 1; counter++)
+//     {
+//         if (*current == NULL)
+//         {
+//             *current = New();
+//             (*current)->data = value; 
+//             tree->size++;
+//             return NO_ERROR;
+//         }
+        
+//         if      (value <= (*current)->data)
+//             current = &(*current)->left;
+//         else if (value >  (*current)->data)
+//             current = &(*current)->right;    
+//     }
+//     return NO_ERROR;
+// }
 
 Node* New()
 {
@@ -42,6 +130,7 @@ Node* New()
     if (!node) {return 0;}
     node->left  =  NULL;
     node->right =  NULL;
+    node->data  = (char*) calloc(64, sizeof(char));
 
     return node;
 }
@@ -53,23 +142,23 @@ Error PrintNode(Node* node, FILE* To, Order order_value)
     fprintf(To, "( ");
 
     if (order_value == PRE_ORDER)
-        fprintf(To, "%d ", node->data);
-
+        fprintf(To, "%s ", node->data);
+                   //%d
     Error error = PrintNode(node-> left, To, order_value);
     if (error != NO_ERROR)
         return error;
 
     
     if (order_value == IN_ORDER)
-        fprintf(To, "%d ", node->data);
-    
+        fprintf(To, "%s ", node->data);
+                   //%d
     error = PrintNode(node->right, To, order_value);
     if (error != NO_ERROR)
         return error;
     
     if (order_value == POST_ORDER)
-        fprintf(To, "%d ", node->data);
-    
+        fprintf(To, "%s ", node->data);
+                   //%d
     fprintf(To,") ");
 
     return NO_ERROR;
@@ -84,19 +173,18 @@ void Destructor(Control* tree)
 void Delete(Node* node)
 {
     if (!node) return;
+    free(node->data);
     Delete(node-> left);
     Delete(node->right);
-    
+
     free(node);
     return;
 }
 
 Error ReadTree(Node** node, FILE* From, Order order_value)
 {
+    char str[MAX_SIZE_ARG] = {};
     
-    char str[100] = {};
-    int  arg      =  0;
-
     fscanf(From, "%s", str);
 
     if (strcmp(str, "nil") == 0)
@@ -109,8 +197,10 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
 
         if (order_value == PRE_ORDER)
         {
-            fscanf(From, "%d", &arg);
-            (*node)->data = arg;
+            // fscanf(From, "%d", &arg);
+            // (*node)->data = arg;
+            fscanf(From, "%s", str);
+            memcpy((*node)->data, str, MAX_SIZE_ARG);
         }
         
         Error error = ReadTree(&(*node)->left, From, order_value);
@@ -119,8 +209,10 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
 
         if (order_value == IN_ORDER)
         {
-            fscanf(From, "%d", &arg);
-            (*node)->data = arg;
+            // fscanf(From, "%d", &arg);
+            // (*node)->data = arg;
+            fscanf(From, "%s", str);
+            memcpy((*node)->data, str, MAX_SIZE_ARG);
         }
 
         error = ReadTree(&(*node)->right, From, order_value);
@@ -129,8 +221,10 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
         
         if (order_value == POST_ORDER)
         {
-            fscanf(From, "%d", &arg);
-            (*node)->data = arg;
+            // fscanf(From, "%d", &arg);
+            // (*node)->data = arg;
+            fscanf(From, "%s", str);
+            memcpy((*node)->data, str, MAX_SIZE_ARG);
         }
 
         fscanf(From, "%s", str);
@@ -236,20 +330,19 @@ Error GraphicDumpNode(Node* node, size_t counter)
 {
     if (!node) {return NO_ERROR;}
 
-    char str[10] = {};
-    sprintf(str, "%d", node->data);
-    dtNode((int) counter, str);
+    
+    dtNode((int) counter, node->data);
 
     if (node->left  != 0)
     {
         GraphicDumpNode(node->left, counter * 2 + 1);
-        dtLink((int) counter, (int)(counter * 2 + 1), "");
+        dtLink((int) counter, (int)(counter * 2 + 1), "да");
     }
 
     if (node->right != 0)
     {
         GraphicDumpNode(node->right, counter * 2 + 2);
-        dtLink((int) counter, (int)(counter * 2 + 2), "");
+        dtLink((int) counter, (int)(counter * 2 + 2), "нет");
     }
 
     return NO_ERROR;

@@ -1,10 +1,16 @@
 digraph DotGraph
 {
-    Node1 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="20"];
-    Node3 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="15"];
-    Node7 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="5"];
-    Node3 -> Node7 [color="black", style="solid", weight="1", label=""];
-    Node1 -> Node3 [color="black", style="solid", weight="1", label=""];
-    Node4 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="40"];
-    Node1 -> Node4 [color="black", style="solid", weight="1", label=""];
+    Node1 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="красивая"];
+    Node3 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="еще_красивее"];
+    Node7 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="самая_самая_красивая"];
+    Node15 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="карияша"];
+    Node7 -> Node15 [color="black", style="solid", weight="1", label="да"];
+    Node16 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="щеночек"];
+    Node7 -> Node16 [color="black", style="solid", weight="1", label="нет"];
+    Node3 -> Node7 [color="black", style="solid", weight="1", label="да"];
+    Node8 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="кошечка"];
+    Node3 -> Node8 [color="black", style="solid", weight="1", label="нет"];
+    Node1 -> Node3 [color="black", style="solid", weight="1", label="да"];
+    Node4 [shape="ellipse", color="black", fontcolor="black", fillcolor="black", style="solid", weight="1", label="неизвестно"];
+    Node1 -> Node4 [color="black", style="solid", weight="1", label="нет"];
 }

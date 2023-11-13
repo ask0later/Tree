@@ -9,7 +9,8 @@
 
 
 const size_t MAX_SIZE_TREE = 32;
-typedef int Elem_t;
+const size_t MAX_SIZE_ARG  = 64;
+typedef char* Elem_t;
 
 enum Order
 {
@@ -17,7 +18,6 @@ enum Order
     IN_ORDER   = 2,
     POST_ORDER = 3,
 };
-
 
 enum Error
 {
@@ -46,6 +46,11 @@ struct Control
 Error Constructor(Control* tree);
 
 Error InsertValue(Control* tree, Elem_t value);
+Error GuessObject(Control* tree, Node** node);
+
+
+
+Error InputNodeData(Node** node, char* data);
 
 Node*       New();
 void     Delete(Node* node);

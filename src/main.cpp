@@ -8,34 +8,42 @@ int main()
     struct Control tree = {};
 
     FILE* From = fopen(input, "r");
-    //FILE*   To = fopen(output, "w");
-    Constructor(&tree);
+    FILE*   To = fopen(output, "w");
 
+    //Constructor(&tree);
+    
+    ReadTree(&tree.root, From, PRE_ORDER);
+    
+    GuessObject(&tree, &tree.root);
 
-    Error error = ReadTree(&tree.root, From, PRE_ORDER);
-    if (error != NO_ERROR)
-    {
-        DumpErrors(error);
-        Destructor(&tree);
-        return 1;
-    }
-    // tree.root->right->left = tree.root->left->left;
-    error = CheckNoLoop(&tree);
-    if (error != NO_ERROR)
-    {
-        DumpErrors(error);
-        exit(1);
-    }
-    PrintNode(tree.root, stdout, PRE_ORDER);
-
-
+    // PrintNode(tree.root, stdout, PRE_ORDER);
+    // PrintNode(tree.root, To, PRE_ORDER);
     GraphicDump(&tree);
     Destructor(&tree);
 
-    //fclose(To);
+    fclose(To);
     fclose(From);
     return 0;
 }
+
+
+
+
+    // Error error = ReadTree(&tree.root, From, PRE_ORDER);
+    // if (error != NO_ERROR)
+    // {
+    //     DumpErrors(error);
+    //     Destructor(&tree);
+    //     return 1;
+    // }
+    // // tree.root->right->left = tree.root->left->left;
+    // error = CheckNoLoop(&tree);
+    // if (error != NO_ERROR)
+    // {
+    //     DumpErrors(error);
+    //     exit(1);
+    // }
+    // PrintNode(tree.root, stdout, PRE_ORDER);
 
 
 //     InsertValue(&tree, 20);
