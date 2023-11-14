@@ -1,7 +1,7 @@
 #include "tree.h"
 #include "color.h"
 #include "Dotter.h"
-
+#include "stack.h"
 
 const char* outputfile = "testfile.txt";
 const char* GRAPH_DOT  = "Graph.dot";
@@ -10,24 +10,41 @@ Error Constructor(Control* tree)
 {
     assert(tree);
     
-    
     tree->root = New();
-    if (tree->root == NULL) {return ERROR_4;}
+    if (tree->root == NULL) {return ERROR_ALLOCATION;}
 
-    memcpy(tree->root->data, "неизвестно кто", strlen("неизвестно кто"));
+    char source[] = "неизвестно кто";
+
+    Error error = StringConstructor(source, &((tree->root)->str));
+    if (error != NO_ERROR) {return error;}
+
     tree->size = 1;
-    //InputNodeData((tree->root), "неизвестно кто");
 
+    return NO_ERROR;
+}
+
+Error StringConstructor(char* source, String* str)
+{
+    str->size = strlen(source) + 1;
+    str->data = (char*) calloc(str->size, sizeof(char));
+    if (str->data == NULL) {return ERROR_ALLOCATION;}
+    memcpy(str->data, source, str->size);
+    return NO_ERROR;
+}
+
+Error StringDestructor(String* str)
+{
+    str->size = (size_t)INT_MAX;
+    free(str->data);
+    str->data = NULL;
     return NO_ERROR;
 }
 
 Error GuessObject(Control* tree, Node** node)
 {
-    char answer[MAX_SIZE_ARG] = {};
-    char*  str = {};
-    char*  str2 = {};    
-    
-    printf("Это %s?\n", (*node)->data);
+    char  answer[MAX_SIZE_ARG] = {};
+
+    printf("Это %s?\n", (*node)->str.data);
     scanf("%s", answer);
 
     if (strcmp(answer, "да") == 0)
@@ -35,11 +52,10 @@ Error GuessObject(Control* tree, Node** node)
         if ((*node)->left == NULL)
         {
             printf("Похоже, я угадала!\n");
-            return NO_ERROR;
+            return EXIT;
         }
         Error error = GuessObject(tree, &(*node)->left);
-        if (error != NO_ERROR)
-            return error;
+        if (error != NO_ERROR) {return error;}
     }
     else if (strcmp(answer, "нет") == 0)
     {
@@ -49,58 +65,61 @@ Error GuessObject(Control* tree, Node** node)
 
             while (getchar() != '\n')   // clean buffer
                 ;
-            
+
             (*node)->left = New();
 
-            if (((*node)->left) == NULL) {return ERROR_4;}
+            if (((*node)->left) == NULL) {return ERROR_ALLOCATION;}
 
-            InputNodeData(&(*node)->left, str);
+            InputNodeData(&(*node)->left);
             
-
             (*node)->right = New();
-            if (((*node)->right) == NULL) {return ERROR_4;}
+            if (((*node)->right) == NULL) {return ERROR_ALLOCATION;}
 
-            memcpy((*node)->right->data, (*node)->data, MAX_SIZE_ARG);
-    
-            printf("Чем %s отличается от %s\n", (*node)->left->data, (*node)->data);            
+            (*node)->right->str.data = strdup(((*node)->str).data);
 
-            InputNodeData(node, str2);
-        
+            printf("Чем %s отличается от %s\n", (*node)->left->str.data, (*node)->str.data);            
+
+            InputNodeData(node);
+
             printf("Хорошо, я это запомню\n");
         
             tree->size++;
 
             Error error = GuessObject(tree, &(tree->root));
-            if (error != NO_ERROR)
-                return error;
+            if (error != NO_ERROR) {return error;}
         }
         Error error = GuessObject(tree, &(*node)->right);
-        if (error != NO_ERROR)
-                return error;
+        if (error != NO_ERROR) {return error;}
     }
     else 
     {
         printf("Введите корректно\n");
         Error error = GuessObject(tree, node);
-        if (error != NO_ERROR)
-                return error;
+        if (error != NO_ERROR) {return error;}
     }
     return NO_ERROR;
 }
 
-Error InputNodeData(Node** node, char* data)
+Error DefineObject(Control* tree, Node* node, Stack answer, char define[])
+{
+    if (define == NULL) {return DEFINE_IS_NULL;}
+}
+
+Error InputNodeData(Node** node)
 {
     size_t arg = 0;
     
-    memset((*node)->data, 0, MAX_SIZE_ARG);
+    char* source;
+    char ref[MAX_SIZE_ARG];
 
-    getline(&data, &arg, stdin);
-    memcpy((*node)->data, data, strlen(data) - 1);
-    free(data);
+    free((*node)->str.data);
+    getline(&source, &arg, stdin);
+    memcpy(ref, source, strlen(source) - 1);
+    (*node)->str.data = strdup(ref);
+    free(source);
 
     return NO_ERROR;
 }
-
 
 // Error InsertValue(Control* tree, Elem_t value)
 // {
@@ -128,21 +147,25 @@ Node* New()
 {
     Node* node = (Node*) calloc(1, sizeof(Node));
     if (!node) {return 0;}
-    node->left  =  NULL;
-    node->right =  NULL;
-    node->data  = (char*) calloc(64, sizeof(char));
+
+    node->left     =  NULL;
+    node->right    =  NULL;
+    node->str.data =  NULL;
+    node->str.size =     0;
 
     return node;
 }
 
 Error PrintNode(Node* node, FILE* To, Order order_value)
 {
+    if (To == NULL) {return FILE_NOT_OPEN;}
+
     if (!node) {fprintf(To, "nil "); return NO_ERROR;}
 
     fprintf(To, "( ");
 
     if (order_value == PRE_ORDER)
-        fprintf(To, "%s ", node->data);
+        fprintf(To, "%s ", node->str.data);
                    //%d
     Error error = PrintNode(node-> left, To, order_value);
     if (error != NO_ERROR)
@@ -150,14 +173,14 @@ Error PrintNode(Node* node, FILE* To, Order order_value)
 
     
     if (order_value == IN_ORDER)
-        fprintf(To, "%s ", node->data);
+        fprintf(To, "%s ", node->str.data);
                    //%d
     error = PrintNode(node->right, To, order_value);
     if (error != NO_ERROR)
         return error;
     
     if (order_value == POST_ORDER)
-        fprintf(To, "%s ", node->data);
+        fprintf(To, "%s ", node->str.data);
                    //%d
     fprintf(To,") ");
 
@@ -166,41 +189,47 @@ Error PrintNode(Node* node, FILE* To, Order order_value)
 
 void Destructor(Control* tree)
 {
-    Delete(tree->root);
     tree->size = 99999;
+    
+    Delete(tree->root);
 }
 
 void Delete(Node* node)
 {
     if (!node) return;
-    free(node->data);
-    Delete(node-> left);
+
+    StringDestructor(&(node->str));
+    Delete(node->left);
+    
     Delete(node->right);
 
+    free((node->str).data);
     free(node);
     return;
 }
 
 Error ReadTree(Node** node, FILE* From, Order order_value)
 {
-    char str[MAX_SIZE_ARG] = {};
+    if (From == NULL) {return FILE_NOT_OPEN;}
+    char ptr[MAX_SIZE_ARG] = {};
+    char* source;
+    source = ptr;
+    // [] ???
     
-    fscanf(From, "%s", str);
+    fscanf(From, "%s", ptr);
 
-    if (strcmp(str, "nil") == 0)
+    if (strcmp(source, "nil") == 0)
         return NO_ERROR;
 
-    if (strcmp(str, "(") == 0)
+    if (strcmp(source, "(") == 0)
     {
         *node = New();
-        if (*node == NULL) {return ERROR_4;}
+        if (*node == NULL) {return ERROR_ALLOCATION;}
 
         if (order_value == PRE_ORDER)
         {
-            // fscanf(From, "%d", &arg);
-            // (*node)->data = arg;
-            fscanf(From, "%s", str);
-            memcpy((*node)->data, str, MAX_SIZE_ARG);
+            ReadPhrase(source, From);
+            StringConstructor(source, &(*node)->str);
         }
         
         Error error = ReadTree(&(*node)->left, From, order_value);
@@ -209,10 +238,9 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
 
         if (order_value == IN_ORDER)
         {
-            // fscanf(From, "%d", &arg);
-            // (*node)->data = arg;
-            fscanf(From, "%s", str);
-            memcpy((*node)->data, str, MAX_SIZE_ARG);
+            //fscanf(From, "%s", source);
+            ReadPhrase(source, From);
+            StringConstructor(source, &(*node)->str);
         }
 
         error = ReadTree(&(*node)->right, From, order_value);
@@ -221,24 +249,40 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
         
         if (order_value == POST_ORDER)
         {
-            // fscanf(From, "%d", &arg);
-            // (*node)->data = arg;
-            fscanf(From, "%s", str);
-            memcpy((*node)->data, str, MAX_SIZE_ARG);
+            ReadPhrase(source, From);
+            StringConstructor(source, &(*node)->str);
         }
 
-        fscanf(From, "%s", str);
-        if (strcmp(str, ")") != 0)
+        fscanf(From, "%s", source);
+        if (strcmp(source, ")") != 0)
         {
-            return ERROR_1;
+            return ERROR_RIGHT_BRACKET;
         }
     }
     else    
-        return ERROR_2;
+        return ERROR_LEFT_BRACKET;
 
     return NO_ERROR;
 }
 
+Error ReadPhrase(char* source, FILE* From)
+{
+    if (From == NULL) {return FILE_NOT_OPEN;}
+    char c;
+    size_t counter = 0;
+    c = getc(From);
+    while ((c != 'n') && (c != '('))
+    {
+        source[counter] = c;
+        c = getc(From);
+        counter++;
+    }
+    long position = ftell(From);
+    if (position == 1L) {return ERROR_POSITIONING_FUNC;}
+
+    fseek(From, position - 1, SEEK_SET);
+    return NO_ERROR;
+}
 Error GraphicDump(Control* tree)
 {
     dtBegin(GRAPH_DOT);                        // Начало dot-описания графа
@@ -259,7 +303,7 @@ Error GraphicDump(Control* tree)
 Error CheckNoLoop(Control* tree)
 {
     // 
-    if (2 * tree->size > MAX_SIZE_TREE) {return ERROR_5;}   
+    if (2 * tree->size > MAX_SIZE_TREE) {return ERROR_CONST;}   
 
     Node* addresses[MAX_SIZE_TREE] = {};
     //              ^_______ 2 tree.size
@@ -270,7 +314,7 @@ Error CheckNoLoop(Control* tree)
     {
         if ((addresses[i] == addresses[i + 1]) && (addresses[i] != NULL))
         {
-            return ERROR_3; // loop
+            return ERROR_LOOP; // loop
         }
     }
     return NO_ERROR;
@@ -331,7 +375,7 @@ Error GraphicDumpNode(Node* node, size_t counter)
     if (!node) {return NO_ERROR;}
 
     
-    dtNode((int) counter, node->data);
+    dtNode((int) counter, node->str.data);
 
     if (node->left  != 0)
     {
@@ -360,27 +404,33 @@ void DumpErrors(Error error)
 {
     switch(error)
     {
-        case 0 << 0:
+        case NO_ERROR:
             return;
             break;
-        case ERROR_1:
-            printf("error1: has not been detected ')'\n");
+        case ERROR_RIGHT_BRACKET:
+            printf("error: has not been detected ')'\n");
             break;
-        case ERROR_2:
-            printf("error2: has not been detected '('\n");
+        case ERROR_LEFT_BRACKET:
+            printf("error: has not been detected '('\n");
             break;
-        case ERROR_3:
-            printf("error3: loop in tree\n");
+        case ERROR_LOOP:
+            printf("error: loop in tree\n");
             break;
-        case ERROR_4:
-            printf("error4: memory allocation is fail\n");
+        case ERROR_ALLOCATION:
+            printf("error: memory allocation is fail\n");
             break;
-        case ERROR_5:
-            printf("error5: address array has no memory for all addresses "
+        case ERROR_CONST:
+            printf("error: address array has no memory for all addresses "
             "(change the constant responsible for the maximum tree size) \n");
             break;
-        case ERROR_6:
-            printf("error6: \n");
+        case FILE_NOT_OPEN:
+            printf("error: failed to open file \n");
+            break;
+        case ERROR_POSITIONING_FUNC:
+            printf("error: error in file positioning functions\n");
+            break;
+        case DEFINE_IS_NULL:
+            printf("error: define is null\n");
             break;
         default:
             printf("extra error\n");
