@@ -152,12 +152,12 @@ TreeError GiveDefine(Tree* tree, Iterator* answer, char* define)
     while(answer->list->num_elem != 0)
     {
         value = (int) Pop_Front(answer);
-        if (value == TRUE)
+        if (value == (int)true)
         {
             printf(" %s", current->str.data);
             current = current->left;
         }
-        else if (value == FALSE)
+        else if (value == (int)false)
         {
             printf(" не %s", current->str.data);
             current = current->right;
@@ -183,14 +183,14 @@ TreeError GiveCompare(Tree* tree, Iterator* answer1, Iterator* answer2, char* de
         printf("%s и %s -", define1, define2);
     while (value1 == value2)
     {
-        if (value1 == TRUE)
+        if (value1 == (int)true)
         {
             printf(" %s", current->str.data);
             
             if (current->left != NULL)
                 current = current->left;
         }
-        else if (value1 == FALSE)
+        else if (value1 == (int)false)
         {
             printf(" не %s", current->str.data);
             current = current->right;
@@ -221,12 +221,12 @@ void GiveSign(Node* current, Iterator* answer, int value)
 {
     do
     {
-        if (value == TRUE)
+        if (value == (int)true)
         {
             printf(" %s", current->str.data);
             current = current->left;
         }
-        else if (value == FALSE)
+        else if (value == (int)false)
         {
             printf(" не %s", current->str.data);
             current = current->right;
@@ -308,14 +308,14 @@ TreeError ComposePath(Tree* tree, Node* node, Iterator* answer, char define[])
     TreeError error;
     if (node->left != NULL)
     {
-        Push_Back(answer, TRUE);
+        Push_Back(answer, (int)true);
         error = ComposePath(tree, node->left, answer, define);
         if (error != NO_ERROR) {return error;}
     }
 
     if (node->right != NULL)
     {
-        Push_Back(answer, FALSE);
+        Push_Back(answer, (int)false);
         error = ComposePath(tree, node->right, answer, define);
         if (error != NO_ERROR) {return error;}
     }

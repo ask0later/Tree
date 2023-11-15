@@ -36,13 +36,6 @@ enum TreeError
     EXIT
 };
 
-enum TRUEorFALSE
-{
-    FALSE,
-    TRUE
-};
-
-
 struct String
 {
     char*  data;
