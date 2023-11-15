@@ -3,7 +3,7 @@
 
 int main()
 {
-    Error error = Interaction();
+    TreeError error = Interaction();
     if (error != NO_ERROR)
     {
         DumpErrors(error);

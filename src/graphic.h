@@ -1,17 +1,15 @@
 #ifndef GRAPHIClib
 #define GRAPHIClib
-// #include "list.h"
-// #include "tree.h" 
-// #include "Dotter.h"
-// const char* GRAPH_DOT = "Graph.dot";
+#include "list.h"
+#include "tree.h" 
 
 
-// void    GraphicDumpList(Iterator* it);
-// void CreateGraphicNodes(List* list);
-// void CreateGraphicLinks(List* list);
+void    GraphicDumpList(Iterator* it);
+void CreateGraphicNodes(List* list);
+void CreateGraphicLinks(List* list);
 
-// Error   GraphicDump(Tree* tree);
-// Error GraphicDumpNode(Node* node, size_t counter);
+TreeError   GraphicDump(Tree* tree);
+TreeError GraphicDumpNode(Node* node, size_t counter);
 
 
 

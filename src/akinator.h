@@ -9,7 +9,6 @@
 
 #include "list.h"
 #include "color.h"
-#include "graphic.h"
 #include "tree.h"
 
 TreeError Interaction();

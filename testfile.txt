@@ -1,1 +1,0 @@
-( ( nil nil 5 ) ( ( ( nil nil 11 ) nil 12 ) ( nil nil 20 ) 15 ) 10 )

@@ -1,4 +1,5 @@
 #include "akinator.h"
+#include "graphic.h"
 
 const char*  lib   =  "lib.txt";
 
@@ -57,6 +58,8 @@ TreeError Interaction()
         error = InteractionCompare(&tree, define1, define2);
     }
     
+    GraphicDump(&tree);
+
     DestructorTree(&tree);
 
     return error;
@@ -82,7 +85,7 @@ TreeError InteractionGuess(Tree* tree)
         fclose(File);
     }
     
-    //GraphicDump(tree);
+    GraphicDump(tree);
 
     return NO_ERROR;
 }
@@ -149,12 +152,12 @@ TreeError GiveDefine(Tree* tree, Iterator* answer, char* define)
     while(answer->list->num_elem != 0)
     {
         value = (int) Pop_Front(answer);
-        if (value == 1)
+        if (value == TRUE)
         {
             printf(" %s", current->str.data);
             current = current->left;
         }
-        else if (value == 0)
+        else if (value == FALSE)
         {
             printf(" не %s", current->str.data);
             current = current->right;
@@ -180,14 +183,14 @@ TreeError GiveCompare(Tree* tree, Iterator* answer1, Iterator* answer2, char* de
         printf("%s и %s -", define1, define2);
     while (value1 == value2)
     {
-        if (value1 == 1)
+        if (value1 == TRUE)
         {
             printf(" %s", current->str.data);
             
             if (current->left != NULL)
                 current = current->left;
         }
-        else if (value1 == 0)
+        else if (value1 == FALSE)
         {
             printf(" не %s", current->str.data);
             current = current->right;
@@ -218,12 +221,12 @@ void GiveSign(Node* current, Iterator* answer, int value)
 {
     do
     {
-        if (value == 1)
+        if (value == TRUE)
         {
             printf(" %s", current->str.data);
             current = current->left;
         }
-        else if (value == 0)
+        else if (value == FALSE)
         {
             printf(" не %s", current->str.data);
             current = current->right;
