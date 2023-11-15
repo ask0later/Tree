@@ -20,8 +20,8 @@ enum Order
     POST_ORDER = 3,
 };
 
-enum Error
-{ //Tree
+enum TreeError
+{
     NO_ERROR,       
     ERROR_RIGHT_BRACKET,
     ERROR_LEFT_BRACKET,
@@ -38,7 +38,7 @@ enum Error
 
 enum TRUEorFALSE
 {
-    FASLE,
+    FALSE,
     TRUE
 };
 
@@ -62,46 +62,39 @@ struct Tree
     size_t size;
 };
 
-Error ConstructorTree(Tree* tree);
-void   DestructorTree(Tree* tree);
+TreeError ConstructorTree(Tree* tree);
+void       DestructorTree(Tree* tree);
 
 Node*   NewNode();
 void DeleteNode(Node* node);
 
+TreeError  StringConstructor(char* source, String* str);
+TreeError   StringDestructor(String* str);
 
 
-Error  StringConstructor(char* source, String* str);
-Error   StringDestructor(String* str);
-
-
-Error InsertValue(Tree* tree, Elem_t value);
-
-
-Error InputNodeData(Node** node);
-
-
+TreeError InsertValue(Tree* tree, Elem_t value);
+char*      ReadPhrase(FILE* File);
 
 
 void       TextDump(Tree* tree);
 
-Error  PrintNode(Node* node, FILE*   To, Order order_value);
+TreeError  PrintNode(Node* node, FILE*   To, Order order_value);
+TreeError  ReadTree(Node** node, FILE* From, Order order_value);
 
-Error ReadTree(Node** node, FILE* From, Order order_value);
 
-Error ReadPhrase(char* source, FILE* From);
+
+TreeError   CheckNoLoop(Tree tree);
+TreeError NodeTraversal(Node* node, Node* addresses[], size_t counter);
+
+TreeError Qsort(Node* addresses[], int first, int last);
+TreeError  Swap(Node* addresses[], int left, int right);
+
+void DumpErrors(TreeError error);
+
 void WriteToFile(Tree* tree);
 
-Error   CheckNoLoop(Tree* tree);
-Error NodeTraversal(Node* node, Node* addresses[], size_t counter);
+TreeError ReadTextPhrase(char* source, FILE* From);
 
-
-Error Qsort(Node* addresses[], int first, int last);
-Error  Swap(Node* addresses[], int left, int right);
-
-
-
-
-void DumpErrors(Error error);
 
 #endif
 

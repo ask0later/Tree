@@ -2,58 +2,56 @@
 
 const char*  lib   =  "lib.txt";
 
-Error Interaction()
+TreeError Interaction()
 {
     int answer = 0;
     printf(GREEN_COLOR "Guess[1]" YELLOW_COLOR "Define[2]" BLUE_COLOR "Compare[3]\n" END_COLOR);
     if (scanf("%d", &answer) != 1) 
         Interaction();
     
-    printf("%d\n", answer);
     while (getchar() != '\n')   // clean buffer
         ;
 
     Tree tree = {};
-    Error error;
+    TreeError error;
     FILE*   File = fopen(lib, "r");   
 
     ReadTree(&tree.root, File, PRE_ORDER);
     fclose(File);
     
-    // PrintNode(tree.root, stderr, PRE_ORDER);
-
-
-    // error = CheckNoLoop(&tree); //ВАТАФАК
-    // if (error != NO_ERROR)
-    // {
-    //     DumpErrors(error);
-    //     exit(1);
-    // }
+    error = CheckNoLoop(tree); 
+    if (error != NO_ERROR)
+    {
+        DumpErrors(error);
+        exit(1);
+    }
 
     char define1[MAX_SIZE_ARG] = {};
     char define2[MAX_SIZE_ARG] = {};
     char* temp1;
     char* temp2;
-    size_t n = 0;
+
     if (answer == 1)
     {
         error = InteractionGuess(&tree);
     }
     else if (answer == 2)
     {
-        getline(&temp1, &n, stdin);
-        memcpy(define1, temp1, strlen(temp1) - 1);
+        printf("Введите объект, определение которого вы хотите узнать\n");
+        temp1 = ReadPhrase(stdin);
+        memcpy(define1, temp1, strlen(temp1));
         free(temp1);
         error = InteractionDefine(&tree, define1);
     }
     else if (answer == 3)
     {
-        getline(&temp1, &n, stdin);
-        memcpy(define1, temp1, strlen(temp1) - 1);
+        printf("Введите объекты, сравнить которые вы хотите\n");
+        temp1 = ReadPhrase(stdin);
+        memcpy(define1, temp1, strlen(temp1));
         free(temp1);
 
-        getline(&temp2, &n, stdin);
-        memcpy(define2, temp2, strlen(temp2) - 1);
+        temp2 = ReadPhrase(stdin);
+        memcpy(define2, temp2, strlen(temp2));
         free(temp2);
 
         error = InteractionCompare(&tree, define1, define2);
@@ -64,11 +62,11 @@ Error Interaction()
     return error;
 }
 
-Error InteractionGuess(Tree* tree)
+TreeError InteractionGuess(Tree* tree)
 {
     int  value =  INT_MAX;
                                     
-    Error error = GuessObject(tree, &((*tree).root));
+    TreeError error = GuessObject(tree, &((*tree).root));
     if ((error != NO_ERROR) && (error != EXIT))
     {
         DestructorTree(tree);
@@ -89,14 +87,13 @@ Error InteractionGuess(Tree* tree)
     return NO_ERROR;
 }
 
-Error InteractionDefine(Tree* tree, char* define)
+TreeError InteractionDefine(Tree* tree, char* define)
 {
     Iterator answer = {};
     
     ConstructorList(&answer);
 
-    Error error = ComposePath(tree, tree->root, &answer, define);
-    printf("%d\n", answer.list->num_elem);
+    TreeError error = ComposePath(tree, tree->root, &answer, define);
     if (answer.list->num_elem == -1)
     {
         DestructorList(&answer);
@@ -110,20 +107,16 @@ Error InteractionDefine(Tree* tree, char* define)
     return NO_ERROR;
 }
 
-Error InteractionCompare(Tree* tree, char* define1, char* define2)
+TreeError InteractionCompare(Tree* tree, char* define1, char* define2)
 {
     Iterator answer1 = {};
     Iterator answer2 = {};
-
-    fprintf(stderr, "%s\n", define1);
-    fprintf(stderr, "%s\n", define2);
 
     ConstructorList(&answer1);
     ConstructorList(&answer2);
 
 
-    Error error = ComposePath(tree, tree->root, &answer1, define1);
-    printf("%d\n", answer1.list->num_elem);
+    TreeError error = ComposePath(tree, tree->root, &answer1, define1);
     if (answer1.list->num_elem == -1)
     {
         DestructorList(&answer1);
@@ -131,7 +124,6 @@ Error InteractionCompare(Tree* tree, char* define1, char* define2)
         return ELEMENT_NOT_FOUND;
     }
     error = ComposePath(tree, tree->root, &answer2, define2);
-    printf("%d\n", answer2.list->num_elem);
     if (answer1.list->num_elem == -1)
     {
         DestructorList(&answer1);
@@ -144,20 +136,46 @@ Error InteractionCompare(Tree* tree, char* define1, char* define2)
     DestructorList(&answer1);
     DestructorList(&answer2);
 
+    return error;
+}
+
+TreeError GiveDefine(Tree* tree, Iterator* answer, char* define)
+{
+    int value;
+    Node* current = tree->root;
+
+    printf("%s -", define);
+    
+    while(answer->list->num_elem != 0)
+    {
+        value = (int) Pop_Front(answer);
+        if (value == 1)
+        {
+            printf(" %s", current->str.data);
+            current = current->left;
+        }
+        else if (value == 0)
+        {
+            printf(" не %s", current->str.data);
+            current = current->right;
+        }
+        if (answer->list->num_elem != 0)
+            printf(",");
+    }
+
+    printf(".\n");
     return NO_ERROR;
 }
 
-Error GiveCompare(Tree* tree, Iterator* answer1, Iterator* answer2, char* define1, char* define2)
+TreeError GiveCompare(Tree* tree, Iterator* answer1, Iterator* answer2, char* define1, char* define2)
 {
     int value1;
     int value2;
 
     Node* current = tree->root;
-    printf("%s и %s - ", define1, define2);
-    //size_t num = answer->list->num_elem;
     
-    value1 = Pop_Front(answer1);
-    value2 = Pop_Front(answer2);
+    value1 = (int) Pop_Front(answer1);
+    value2 = (int) Pop_Front(answer2);
     if (value1 == value2)
         printf("%s и %s -", define1, define2);
     while (value1 == value2)
@@ -174,62 +192,57 @@ Error GiveCompare(Tree* tree, Iterator* answer1, Iterator* answer2, char* define
             printf(" не %s", current->str.data);
             current = current->right;
         }
-        value1 = Pop_Front(answer1);
-        value2 = Pop_Front(answer2);
+        value1 = (int) Pop_Front(answer1);
+        value2 = (int) Pop_Front(answer2);
+        printf(",");
     }
+
     Node* current1 = current;
     Node* current2 = current;
     printf(" но %s", define1);
-    size_t num1 = answer1->list->num_elem + 1;
-    do
-    {
-        if (value1 == 1)
-        {
-            printf(" %s", current1->str.data);
-            current1 = current1->left;
-        }
-        else if (value1 == 0)
-        {
-            printf(" не %s", current1->str.data);
-            current1 = current1->right;
-        }
-        if (num1 != 0)
-            printf(",");
-        value1 = Pop_Front(answer1);
-        num1--;
-    } while (num1 != 0);
+    
+    GiveSign(current1, answer1, value1);
+
+    printf(",");
 
     printf(" а %s", define2);
-    size_t num2 = answer2->list->num_elem + 1;
-    do
-    {
-        if (value2 == 1)
-        {
-            printf(" %s", current2->str.data);
-            current2 = current2->left;
-        }
-        else if (value2 == 0)
-        {
-            printf(" не %s", current2->str.data);
-            current2 = current2->right;
-        }
-        if (num2 != 0)
-            printf(",");
-        value2 = Pop_Front(answer2);
-        num2--;
-    } while (num2 != 0);
+    
+    GiveSign(current2, answer2, value2);
 
     printf(".\n");
 
     return NO_ERROR;
 }
 
-Error GuessObject(Tree* tree, Node** node)
+void GiveSign(Node* current, Iterator* answer, int value)
+{
+    do
+    {
+        if (value == 1)
+        {
+            printf(" %s", current->str.data);
+            current = current->left;
+        }
+        else if (value == 0)
+        {
+            printf(" не %s", current->str.data);
+            current = current->right;
+        }
+        
+        value = (int) Pop_Front(answer);
+        if (answer->list->num_elem + 1 != 0)
+            printf(",");
+    } while (answer->list->num_elem + 1 != 0);
+
+}
+
+TreeError GuessObject(Tree* tree, Node** node)
 {
     char  answer[MAX_SIZE_ARG] = {};
 
     printf("Это %s?\n", (*node)->str.data);
     scanf("%s", answer);
+    TreeError error;
 
     if (strcmp(answer, "да") == 0)
     {
@@ -238,7 +251,7 @@ Error GuessObject(Tree* tree, Node** node)
             printf("Похоже, я угадала!\n");
             return EXIT;
         }
-        Error error = GuessObject(tree, &(*node)->left);
+        error = GuessObject(tree, &(*node)->left);
         if (error != NO_ERROR) {return error;}
     }
     else if (strcmp(answer, "нет") == 0)
@@ -253,8 +266,9 @@ Error GuessObject(Tree* tree, Node** node)
             (*node)->left = NewNode();
 
             if (((*node)->left) == NULL) {return ERROR_ALLOCATION;}
-
-            InputNodeData(&(*node)->left);
+            
+            free((*node)->left->str.data);
+            (*node)->left->str.data = ReadPhrase(stdin);
             
             (*node)->right = NewNode();
             if (((*node)->right) == NULL) {return ERROR_ALLOCATION;}
@@ -263,77 +277,48 @@ Error GuessObject(Tree* tree, Node** node)
 
             printf("Чем %s отличается от %s\n", (*node)->left->str.data, (*node)->str.data);            
 
-            InputNodeData(node);
+            free((*node)->str.data);
+            (*node)->str.data = ReadPhrase(stdin);
 
             printf("Хорошо, я это запомню\n");
         
             tree->size++;
 
-            Error error = GuessObject(tree, &(tree->root));
+            error = GuessObject(tree, &(tree->root));
             if (error != NO_ERROR) {return error;}
         }
-        Error error = GuessObject(tree, &(*node)->right);
+        error = GuessObject(tree, &(*node)->right);
         if (error != NO_ERROR) {return error;}
     }
     else 
     {
         printf("Введите корректно\n");
-        Error error = GuessObject(tree, node);
+        error = GuessObject(tree, node);
         if (error != NO_ERROR) {return error;}
     }
     return NO_ERROR;
 }
 
-Error GiveDefine(Tree* tree, Iterator* answer, char* define)
-{
-    int value;
-    Node* current = tree->root;
-    printf("%s - ", define);
-    size_t num = answer->list->num_elem;
-    while(num != 0)
-    {
-        num--;
-        value = Pop_Front(answer);
-        if (value == 1)
-        {
-            printf(" %s", current->str.data);
-            current = current->left;
-        }
-        else if (value == 0)
-        {
-            printf(" не %s", current->str.data);
-            current = current->right;
-        }
-        if (num != 0)
-            printf(",");
-    }
-
-    printf(".\n");
-    return NO_ERROR;
-}
-
-Error ComposePath(Tree* tree, Node* node, Iterator* answer, char define[])
+TreeError ComposePath(Tree* tree, Node* node, Iterator* answer, char define[])
 {
     if (define == NULL) {return DEFINE_IS_NULL;}
-
+    TreeError error;
     if (node->left != NULL)
     {
         Push_Back(answer, TRUE);
-        Error error = ComposePath(tree, node->left, answer, define);
+        error = ComposePath(tree, node->left, answer, define);
         if (error != NO_ERROR) {return error;}
     }
 
     if (node->right != NULL)
     {
-        Push_Back(answer, FASLE);
-        Error error = ComposePath(tree, node->right, answer, define);
+        Push_Back(answer, FALSE);
+        error = ComposePath(tree, node->right, answer, define);
         if (error != NO_ERROR) {return error;}
     }
 
-    printf("<%s> and <%s>\n", define, node->str.data);
     if (strcmp(node->str.data, define) == 0 )
     {
-        printf("РАВНО\n");
         return EXIT;
     }
     else
@@ -342,18 +327,15 @@ Error ComposePath(Tree* tree, Node* node, Iterator* answer, char define[])
     return NO_ERROR;
 }
 
-Error InputNodeData(Node** node)
+char* ReadPhrase(FILE* File)
 {
     size_t arg = 0;
-    
     char* source;
-    char ref[MAX_SIZE_ARG];
 
-    free((*node)->str.data);
-    getline(&source, &arg, stdin);
+    getline(&source, &arg, File);
+    char* ref = (char*) calloc(strlen(source), sizeof(char));
     memcpy(ref, source, strlen(source) - 1);
-    (*node)->str.data = strdup(ref);
     free(source);
 
-    return NO_ERROR;
+    return ref;
 }

@@ -199,7 +199,7 @@ using namespace DotterSystem;
 //!
 //! @param Message - ñîîáùåíèå, ïîÿñíÿþùåå îøèáêó
 //===============================================================================
-void dtError (const char Message []);
+static void dtError (const char Message []);
 
 //==============================================================================
 
@@ -209,7 +209,7 @@ void dtError (const char Message []);
 //!
 //! @param To - Ôàéë, êóäà ïèñàòü. Âñå êîìàíäû (ñì. @ref dtNode, @ref dtLink) äî @ref dtEnd áóäóò ïèñàòüñÿ â ýòîò ôàéë
 //===============================================================================
-void dtBegin (FILE* To);
+static void dtBegin (FILE* To);
 
 //===============================================================================
 //! @ingroup Main
@@ -217,19 +217,19 @@ void dtBegin (FILE* To);
 //!
 //! @param Name - Èìÿ ôàéëà, êóäà ïèñàòü. Âñå êîìàíäû (ñì. @ref dtNode, @ref dtLink) äî @ref dtEnd áóäóò ïèñàòüñÿ â ýòîò ôàéë
 //===============================================================================
-inline void dtBegin (const char Name []);
+static inline void dtBegin (const char Name []);
 
 //===============================================================================
 //! @ingroup Main
 //! @brief   Çàêîí÷èòü îïèñàíèå dot ãðàôà.
 //===============================================================================
-void dtEnd  ();
+static void dtEnd  ();
 
 //===============================================================================
 //! @ingroup Main
 //! @brief   Âûâåñòè ñòðîêó â ïðèãîäíîì äëÿ Dot ôîðìàòå.
 //===============================================================================
-void dtOut (const char Str []);
+static void dtOut (const char Str []);
 
 //==============================================================================
 
@@ -278,7 +278,7 @@ newDotLinkStyle& dtLinkStyle  (const newDotLinkStyle LinkStyle = CurrentLinkStyl
 //! @param NodeStyle   - Ñòðóêòóðà, ñ îïèñàííûì ñòèëåì óçëà. Åñëè íå óêàçàíî, èñïîëüçóåòñÿ òåêóùàÿ(ñì. @ref dtNodeStyle)
 //! @param ExtraParams - Äîïîëíèòåëüíûå ïàðàìåòðû(ñì. dotguide)
 //===============================================================================
-void dtNode  (const int NodeN, const char Label [] = "", const newDotNodeStyle NodeStyle = CurrentNodeStyle, const char ExtraParams [] = "");
+static void dtNode  (const int NodeN, const char Label [] = "", const newDotNodeStyle NodeStyle = CurrentNodeStyle, const char ExtraParams [] = "");
 
 //===============================================================================
 //! @ingroup Main
@@ -290,7 +290,7 @@ void dtNode  (const int NodeN, const char Label [] = "", const newDotNodeStyle N
 //! @param LinkStyle   - Ñòðóêòóðà, ñî ñòèëåì ñâÿçè. Åñëè íå óêàçàíî, èñïîëüçóåòñÿ òåêóùèé (ñì. @ref dtLinkStyle)
 //! @param ExtraParams - Äîïîëíèòåëüíûå ïàðàìåòðû(ñì. dotguide)
 //===============================================================================
-void dtLink (const int FromNode, const int ToNode, const char Label [] = "", const newDotLinkStyle LinkStyle = CurrentLinkStyle, const char ExtraParams [] = "");
+static void dtLink (const int FromNode, const int ToNode, const char Label [] = "", const newDotLinkStyle LinkStyle = CurrentLinkStyle, const char ExtraParams [] = "");
 
 //==============================================================================
 
@@ -303,11 +303,11 @@ void dtLink (const int FromNode, const int ToNode, const char Label [] = "", con
 //! @param Type - Òèï (jpg, bmp, ...)
 //! @param Show - Ïîêàçûâàòü ôàéë ïîñëå ñîçäàíèÿ, èëè íåò
 //===============================================================================
-void dtRender (const char From [], const char To [] = "Graph.jpg", const char Type [] = "jpg", const bool Show = true);
+static void dtRender (const char From [], const char To [] = "Graph.jpg", const char Type [] = "jpg", const bool Show = true);
 
 //==============================================================================
 
-void dtError (const char Message [])
+static void dtError (const char Message [])
 {
     throw Message;    
 
@@ -323,7 +323,7 @@ void dtError (const char Message [])
 
 //==============================================================================
 
-void dtBegin (FILE* To)
+static void dtBegin (FILE* To)
 { 
     if (!To) dtError ("No output file");
     if (CurrentFile) dtError ("Close previous file first");      
@@ -334,7 +334,7 @@ void dtBegin (FILE* To)
     //fprintf (CurrentFile, "rankdir=LR;\n");
 }
 
-inline void dtBegin (const char Name [])
+static inline void dtBegin (const char Name [])
 {
     FILE* To = NULL;
     To = fopen (Name, "w");
@@ -344,7 +344,7 @@ inline void dtBegin (const char Name [])
     dtBegin (To);       
 }
 
-void dtEnd()
+static void dtEnd()
 {
     if (!CurrentFile) dtError ("No output file");      
     
@@ -360,7 +360,7 @@ void dtEnd()
     CurrentFile = NULL;
 }
 
-void dtOut (const char Str [])
+static void dtOut (const char Str [])
 {
     if (!CurrentFile) dtError ("No output file");       
      
@@ -454,7 +454,7 @@ void dtNode (const int NodeN, const char Label [], const newDotNodeStyle NodeSty
     fprintf (CurrentFile, "];\n");   
 }
 
-void dtLink (const int FromNode, const int ToNode, const char Label [], const newDotLinkStyle LinkStyle, const char ExtraParams [])
+static void dtLink (const int FromNode, const int ToNode, const char Label [], const newDotLinkStyle LinkStyle, const char ExtraParams [])
 {
     if (!CurrentFile) dtError ("No output file");      
     
@@ -486,7 +486,7 @@ void dtLink (const int FromNode, const int ToNode, const char Label [], const ne
 
 //==============================================================================
 
-void dtRender (const char From [], const char To [], const char Type [], const bool Show)
+static void dtRender (const char From [], const char To [], const char Type [], const bool Show)
 {
     const int ComandSize = 100; 
      

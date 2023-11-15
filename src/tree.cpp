@@ -1,6 +1,6 @@
 #include "tree.h"
 
-Error ConstructorTree(Tree* tree)
+TreeError ConstructorTree(Tree* tree)
 {
     assert(tree);
     
@@ -9,7 +9,7 @@ Error ConstructorTree(Tree* tree)
 
     char source[] = "неизвестно кто";
 
-    Error error = StringConstructor(source, &((tree->root)->str));
+    TreeError error = StringConstructor(source, &((tree->root)->str));
     if (error != NO_ERROR) {return error;}
 
     tree->size = 1;
@@ -17,7 +17,7 @@ Error ConstructorTree(Tree* tree)
     return NO_ERROR;
 }
 
-Error StringConstructor(char* source, String* str)
+TreeError StringConstructor(char* source, String* str)
 {
     str->size = strlen(source) + 1;
     str->data = (char*) calloc(str->size, sizeof(char));
@@ -26,7 +26,7 @@ Error StringConstructor(char* source, String* str)
     return NO_ERROR;
 }
 
-Error StringDestructor(String* str)
+TreeError StringDestructor(String* str)
 {
     str->size = (size_t)INT_MAX;
     free(str->data);
@@ -69,7 +69,7 @@ Node* NewNode()
     return node;
 }
 
-Error PrintNode(Node* node, FILE* To, Order order_value)
+TreeError PrintNode(Node* node, FILE* To, Order order_value)
 {
     if (To == NULL) {return FILE_NOT_OPEN;}
 
@@ -80,7 +80,7 @@ Error PrintNode(Node* node, FILE* To, Order order_value)
     if (order_value == PRE_ORDER)
         fprintf(To, "%s ", node->str.data);
                    //%d
-    Error error = PrintNode(node-> left, To, order_value);
+    TreeError error = PrintNode(node-> left, To, order_value);
     if (error != NO_ERROR)
         return error;
 
@@ -120,7 +120,7 @@ void DeleteNode(Node* node)
     return;
 }
 
-Error ReadTree(Node** node, FILE* From, Order order_value)
+TreeError ReadTree(Node** node, FILE* From, Order order_value)
 {
     if (From == NULL) {return FILE_NOT_OPEN;}
     char ptr[MAX_SIZE_ARG] = {};
@@ -129,8 +129,6 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
     
     if (fscanf(From, "%s", ptr) == EOF) {return LIB_IS_EMPTY;}
     
-
-    fprintf(stderr, "%s\n", ptr);
     if (strcmp(source, "nil") == 0)
         return NO_ERROR;
 
@@ -141,17 +139,17 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
 
         if (order_value == PRE_ORDER)
         {
-            ReadPhrase(source, From);
+            ReadTextPhrase(source, From);
             (*node)->str.data = strdup(source);
         }
         
-        Error error = ReadTree(&(*node)->left, From, order_value);
+        TreeError error = ReadTree(&(*node)->left, From, order_value);
         if (error != NO_ERROR)
             return error;
 
         if (order_value == IN_ORDER)
         {
-            ReadPhrase(source, From);
+            ReadTextPhrase(source, From);
             (*node)->str.data = strdup(source);
         }
 
@@ -161,7 +159,7 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
         
         if (order_value == POST_ORDER)
         {
-            ReadPhrase(source, From);
+            ReadTextPhrase(source, From);
             (*node)->str.data = strdup(source);
         }
 
@@ -177,7 +175,7 @@ Error ReadTree(Node** node, FILE* From, Order order_value)
     return NO_ERROR;
 }
 
-Error ReadPhrase(char* source, FILE* From)
+TreeError ReadTextPhrase(char* source, FILE* From)
 {
     if (From == NULL) {return FILE_NOT_OPEN;}
     char c;
@@ -202,14 +200,13 @@ Error ReadPhrase(char* source, FILE* From)
 }
 
 
-Error CheckNoLoop(Tree* tree)
+TreeError CheckNoLoop(Tree tree)
 {
-    // 
-    if (2 * tree->size > MAX_SIZE_TREE) {return ERROR_CONST;}   
+    if (2 * tree.size > MAX_SIZE_TREE) {return ERROR_CONST;}   
 
     Node* addresses[MAX_SIZE_TREE] = {};
     //              ^_______ 2 tree.size
-    NodeTraversal(tree->root, addresses, 0);
+    NodeTraversal(tree.root, addresses, 0);
 
     Qsort(addresses, 0, MAX_SIZE_TREE - 1);
     for (size_t i = 0; i < MAX_SIZE_TREE - 2; i++)
@@ -223,7 +220,7 @@ Error CheckNoLoop(Tree* tree)
 }
 
 
-Error Qsort(Node* addresses[], int first, int last)
+TreeError Qsort(Node* addresses[], int first, int last)
 {
     if (first < last)
     {
@@ -250,7 +247,7 @@ Error Qsort(Node* addresses[], int first, int last)
     return NO_ERROR;
 }
 
-Error Swap(Node* addresses[], int left, int right)
+TreeError Swap(Node* addresses[], int left, int right)
 {
     Node* temp = 0;
     temp = addresses[left];
@@ -261,7 +258,7 @@ Error Swap(Node* addresses[], int left, int right)
 }
 
 
-Error NodeTraversal(Node* node, Node* addresses[], size_t counter)
+TreeError NodeTraversal(Node* node, Node* addresses[], size_t counter)
 {
     if (!node) {return NO_ERROR;}
     addresses[counter] = node;
@@ -279,7 +276,7 @@ void TextDump(Tree* tree)
 }
 
 
-void DumpErrors(Error error)
+void DumpErrors(TreeError error)
 {
     switch(error)
     {
