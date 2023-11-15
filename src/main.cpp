@@ -1,34 +1,14 @@
-#include "tree.h"
-#include "akinator.h"
 
-//#include "readfile.h"
-const char*  input =  "inputfile.txt";
-const char*  lib   =  "lib.txt";
+#include "akinator.h"
 
 int main()
 {
-    struct Control tree = {};
-    FILE* File = fopen(lib, "r");
-
-    //Constructor(&tree);
-
-    ReadTree(&tree.root, File, PRE_ORDER);
-
-    Error error = GuessObject(&tree, &tree.root);
-    
-    if ((error != NO_ERROR) && (error != EXIT))
+    Error error = Interaction();
+    if (error != NO_ERROR)
     {
-        Destructor(&tree);
         DumpErrors(error);
         return 1;
     }
-    
-    PrintNode(tree.root, stderr, PRE_ORDER);
-    PrintNode(tree.root, File, PRE_ORDER);
-    GraphicDump(&tree);
-    Destructor(&tree);
-
-    fclose(File);
     
     return 0;
 }

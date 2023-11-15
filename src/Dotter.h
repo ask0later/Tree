@@ -1,11 +1,12 @@
+#ifndef DOTTER__
+#define DOTTER__
+
 //===============================================================================
 //! @file    Dotter.h
 //! @brief Áèáëèîòåêà äëÿ dot.
 //!
 //! $copyright: (C) Danila Baygushev$ <br>       
 //===============================================================================
-#ifndef DOTTER__
-#define DOTTER__
 
 #include "stdio.h"
 #include "stdlib.h"

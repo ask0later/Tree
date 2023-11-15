@@ -2,11 +2,11 @@
 #define TREElib
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <limits.h>
 #include <unistd.h>
-//#include "readfile.h"
-//#include "stack.h"
+#include "color.h"
 
 
 const size_t MAX_SIZE_TREE = 32;
@@ -21,7 +21,7 @@ enum Order
 };
 
 enum Error
-{
+{ //Tree
     NO_ERROR,       
     ERROR_RIGHT_BRACKET,
     ERROR_LEFT_BRACKET,
@@ -31,7 +31,15 @@ enum Error
     FILE_NOT_OPEN,
     ERROR_POSITIONING_FUNC,
     DEFINE_IS_NULL,
+    LIB_IS_EMPTY,
+    ELEMENT_NOT_FOUND,
     EXIT
+};
+
+enum TRUEorFALSE
+{
+    FASLE,
+    TRUE
 };
 
 
@@ -48,45 +56,42 @@ struct Node
     Node*   right;
 };
 
-struct Control
+struct Tree
 {
     Node* root;
     size_t size;
 };
 
-Error Constructor(Control* tree);
+Error ConstructorTree(Tree* tree);
+void   DestructorTree(Tree* tree);
+
+Node*   NewNode();
+void DeleteNode(Node* node);
+
+
 
 Error  StringConstructor(char* source, String* str);
 Error   StringDestructor(String* str);
-Error StringRedefinition(char* source, String* str);
 
 
-Error InsertValue(Control* tree, Elem_t value);
-
-Error  GuessObject(Control* tree, Node** node);
-// Error DefineObject(Control* tree, Node* node, Stack answer, char define[]);
-
+Error InsertValue(Tree* tree, Elem_t value);
 
 
 Error InputNodeData(Node** node);
 
-Node*       New();
-void     Delete(Node* node);
-void Destructor(Control* tree);
 
 
-void       TextDump(Control* tree);
-Error   GraphicDump(Control* tree);
 
-Error GraphicDumpNode(Node* node, size_t counter);
+void       TextDump(Tree* tree);
+
 Error  PrintNode(Node* node, FILE*   To, Order order_value);
 
 Error ReadTree(Node** node, FILE* From, Order order_value);
 
 Error ReadPhrase(char* source, FILE* From);
-void WriteToFile(Control* tree);
+void WriteToFile(Tree* tree);
 
-Error   CheckNoLoop(Control* tree);
+Error   CheckNoLoop(Tree* tree);
 Error NodeTraversal(Node* node, Node* addresses[], size_t counter);
 
 
