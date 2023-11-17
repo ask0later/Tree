@@ -22,9 +22,7 @@ enum Order
 
 enum TreeError
 {
-    NO_ERROR,       
-    ERROR_RIGHT_BRACKET,
-    ERROR_LEFT_BRACKET,
+    NO_ERROR,
     ERROR_LOOP,
     ERROR_ALLOCATION,
     ERROR_CONST,
@@ -33,7 +31,6 @@ enum TreeError
     DEFINE_IS_NULL,
     LIB_IS_EMPTY,
     ELEMENT_NOT_FOUND,
-    INVALID_NAME_BASE,
     EXIT
 };
 
@@ -54,7 +51,6 @@ struct Tree
 {
     Node* root;
     size_t size;
-    //char* name_base;
 };
 
 TreeError ConstructorTree(Tree* tree);

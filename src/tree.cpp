@@ -166,13 +166,7 @@ TreeError ReadTree(Tree* tree, Node** node, FILE* From, Order order_value)
         }
 
         fscanf(From, "%s", source);
-        if (strcmp(source, ")") != 0)
-        {
-            return ERROR_RIGHT_BRACKET;
-        }
     }
-    else    
-        return ERROR_LEFT_BRACKET;
 
     return NO_ERROR;
 }
@@ -284,12 +278,6 @@ void DumpErrors(TreeError error)
     {
         case NO_ERROR:
             return;
-            break;
-        case ERROR_RIGHT_BRACKET:
-            printf("error: has not been detected ')'\n");
-            break;
-        case ERROR_LEFT_BRACKET:
-            printf("error: has not been detected '('\n");
             break;
         case ERROR_LOOP:
             printf("error: loop in tree\n");

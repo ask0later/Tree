@@ -8,12 +8,21 @@ TreeError MainMenu(Tree* tree)
 {
     TreeError error;
     int answer = 0;
-    printf(GREEN_COLOR "ИГРАТЬ" RED_COLOR "[0] " GREEN_COLOR "НАСТРОЙКИ" RED_COLOR "[1] " GREEN_COLOR"ВЫХОД" RED_COLOR "[2]\n" END_COLOR);
 
-    scanf("%d", &answer);
+    printf(GREEN_COLOR "ИГРАТЬ"    RED_COLOR "[0] " 
+           GREEN_COLOR "НАСТРОЙКИ" RED_COLOR "[1] " 
+           GREEN_COLOR "ВЫХОД"     RED_COLOR "[2]\n" END_COLOR);
+
+    if (scanf("%d", &answer) != 1)
+    {
+        CleanBuffer();
+        return MainMenu(tree);
+    }
+    
+
     if (answer == 0)
     {
-        error = Interaction(tree);
+        error = Akinator(tree);
         if (error != NO_ERROR)
             return error;
         
@@ -38,7 +47,7 @@ TreeError MainMenu(Tree* tree)
     return error;
 }
 
-TreeError Interaction(Tree* tree)
+TreeError Akinator(Tree* tree)
 {
     if (tree->root == NULL)
     {
@@ -121,7 +130,8 @@ TreeError SelectBase(Tree* tree)
 
     while ((pDirent = readdir(pDir)) != NULL) 
     {
-        printf ("[%s]\n", pDirent->d_name);
+        if (pDirent->d_type != 4) //type directory in dirent.h 
+            printf("[%s]\n", pDirent->d_name);
     }
     closedir(pDir);
 
@@ -166,7 +176,9 @@ Answer GetAnswer(int x)
     int answer = 0;
     if (x == 1)
     {
-        printf(GREEN_COLOR "Угадывание[1]" YELLOW_COLOR "Определение[2]" BLUE_COLOR "Сравнение[3]\n" END_COLOR);
+        printf(GREEN_COLOR  "Угадывание[1] " 
+               YELLOW_COLOR "Определение[2] " 
+               BLUE_COLOR   "Сравнение[3]\n" END_COLOR);
         if (scanf("%d", &answer) != 1)
         {
             printf("Введите число\n");
@@ -175,7 +187,8 @@ Answer GetAnswer(int x)
     }
     else if (x == 2)
     {
-        printf("Показать дерево[4] [Выбрать базу данных] [5]\n");
+        printf(YELLOW_COLOR "ПОКАЗАТЬ ДЕРЕВО[4] "
+               BLUE_COLOR   "ВЫБРАТЬ БАЗУ[5]\n" END_COLOR);
         scanf("%d", &answer);
     }
 

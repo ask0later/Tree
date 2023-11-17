@@ -27,7 +27,7 @@ enum Answer
 
 
 TreeError MainMenu(Tree* tree);
-TreeError Interaction(Tree* tree);
+TreeError    Akinator(Tree* tree);
 TreeError  Parameters(Tree* tree);
 
 Answer GetAnswer(int x);
