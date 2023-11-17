@@ -7,6 +7,7 @@ int main()
     TreeError error = MainMenu(&tree);
     if (error != NO_ERROR)
     {
+        printf("%d", error);
         DumpErrors(error);
         return 1;
     }

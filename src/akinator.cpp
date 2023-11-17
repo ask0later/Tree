@@ -6,12 +6,13 @@ const char* lib = "lib.txt";
 
 TreeError MainMenu(Tree* tree)
 {
-    TreeError error;
+    //TreeError error;
     int answer = 0;
 
     printf(GREEN_COLOR "ИГРАТЬ"    RED_COLOR "[0] " 
            GREEN_COLOR "НАСТРОЙКИ" RED_COLOR "[1] " 
            GREEN_COLOR "ВЫХОД"     RED_COLOR "[2]\n" END_COLOR);
+    
 
     if (scanf("%d", &answer) != 1)
     {
@@ -19,20 +20,27 @@ TreeError MainMenu(Tree* tree)
         return MainMenu(tree);
     }
     
-
     if (answer == 0)
     {
-        error = Akinator(tree);
+        TreeError error = Akinator(tree);
         if (error != NO_ERROR)
+        {
+            DumpErrors(error);
+            DestructorTree(tree);
             return error;
+        }
         
         return MainMenu(tree);
     }
     else if (answer == 1)
     {
-        error = Parameters(tree);
+        TreeError error = Parameters(tree);
         if (error != NO_ERROR)
+        {
+            DestructorTree(tree);
+            DumpErrors(error);
             return error;
+        }
 
         MainMenu(tree);
     }   
@@ -44,7 +52,7 @@ TreeError MainMenu(Tree* tree)
     else
         return MainMenu(tree);
 
-    return error;
+    return NO_ERROR;
 }
 
 TreeError Akinator(Tree* tree)
@@ -153,7 +161,7 @@ TreeError SelectBase(Tree* tree)
 
     if (check == 1)
     {
-        char str[MAX_SIZE_NAME] = {};
+        char str[MAX_SIZE_NAME + strlen("database/")] = {};
         sprintf(str, "database/%s", name_base);
 
         FILE*   File = fopen(str, "r");
@@ -189,7 +197,11 @@ Answer GetAnswer(int x)
     {
         printf(YELLOW_COLOR "ПОКАЗАТЬ ДЕРЕВО[4] "
                BLUE_COLOR   "ВЫБРАТЬ БАЗУ[5]\n" END_COLOR);
-        scanf("%d", &answer);
+        if (scanf("%d", &answer) != 1)
+        {
+            CleanBuffer();
+            return GetAnswer(x);
+        }
     }
 
     CleanBuffer();
@@ -230,8 +242,6 @@ TreeError InteractionGuess(Tree* tree)
             fclose(File);
         }
     }
-    
-    GraphicDump(tree);
 
     return NO_ERROR;
 }
@@ -243,17 +253,24 @@ TreeError InteractionDefine(Tree* tree, char* define)
     ConstructorList(&answer);
 
     TreeError error = ComposePath(tree, tree->root, &answer, define);
+    if (error == EXIT) {error = NO_ERROR;}
+    
     if (answer.list->num_elem == 0)
     {
         DestructorList(&answer);
         return ELEMENT_NOT_FOUND;
+    }
+    if (error != NO_ERROR)
+    {
+        DestructorTree(tree);
+        return error;
     }
     
     GiveDefine(tree, &answer, define);
     
     DestructorList(&answer);
 
-    return error;
+    return NO_ERROR;
 }
 
 TreeError InteractionCompare(Tree* tree, char* define1, char* define2)
@@ -266,26 +283,28 @@ TreeError InteractionCompare(Tree* tree, char* define1, char* define2)
 
 
     TreeError error = ComposePath(tree, tree->root, &answer1, define1);
+    if (error == EXIT) {error = NO_ERROR;}
     if (answer1.list->num_elem == 0)
     {
         DestructorList(&answer1);
         DestructorList(&answer2);
         return ELEMENT_NOT_FOUND;
     }
-    if ((error != NO_ERROR) && (error != EXIT))
+    if (error != NO_ERROR)
     {
         DestructorTree(tree);
         DumpErrors(error);
         return error;
     }
     error = ComposePath(tree, tree->root, &answer2, define2);
+    if (error == EXIT) {error = NO_ERROR;}
     if (answer2.list->num_elem == 0)
     {
         DestructorList(&answer1);
         DestructorList(&answer2);
         return ELEMENT_NOT_FOUND;
     }
-    if ((error != NO_ERROR) && (error != EXIT))
+    if (error != NO_ERROR)
     {
         DestructorTree(tree);
         DumpErrors(error);
