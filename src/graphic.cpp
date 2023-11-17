@@ -6,14 +6,14 @@ void GraphicDumpList(Iterator* it)
 {
     List* list = it-> list;
 
-    dtBegin("Graph.dot");             // Начало dot-описания графа
+    dtBegin("List.dot");             // Начало dot-описания графа
 
     CreateGraphicNodes(list);       // Создаем узлы
     CreateGraphicLinks(list);       // Создаем связи
 
     dtEnd(); // Конец dot-описания графа
 
-    dtRender("Graph.dot", "Graph.jpg", "jpg", false);
+    dtRender("List.dot", "List.jpg", "jpg", false);
 }
 void CreateGraphicNodes(List* list)
 {
@@ -76,7 +76,7 @@ void CreateGraphicLinks(List* list)
 
 TreeError GraphicDump(Tree* tree)
 {
-    dtBegin("Graph.dot");                        // Начало dot-описания графа
+    dtBegin("Tree.dot");                        // Начало dot-описания графа
 
     dtNodeStyle ().shape        ("ellipse");
     //dtNodeStyle ().style         ("filled");
@@ -86,7 +86,7 @@ TreeError GraphicDump(Tree* tree)
 
     dtEnd();                                   // Конец dot-описания графа
 
-    dtRender("Graph.dot", "Graph.jpg", "jpg", false);
+    dtRender("Tree.dot", "Tree.jpg", "jpg", false);
 
     return NO_ERROR;
 }

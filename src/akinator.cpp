@@ -8,9 +8,8 @@ TreeError MainMenu(Tree* tree)
 {
     TreeError error;
     int answer = 0;
-    printf(BOLD_RED_COLOR   "000000000000""      "                                  BLUE_COLOR "1111111111111""          "BOLD_RED_COLOR "2 - exit\n"
-           BOLD_RED_COLOR   "000" GREEN_COLOR "ИГРАТЬ" BOLD_RED_COLOR "000""      " BLUE_COLOR "11" GREEN_COLOR"НАСТРОЙКИ" BLUE_COLOR"11\n"
-           BOLD_RED_COLOR   "000000000000""      "                                  BLUE_COLOR "1111111111111\n" END_COLOR);
+    printf(GREEN_COLOR "ИГРАТЬ" RED_COLOR "[0] " GREEN_COLOR "НАСТРОЙКИ" RED_COLOR "[1] " GREEN_COLOR"ВЫХОД" RED_COLOR "[2]\n" END_COLOR);
+
     scanf("%d", &answer);
     if (answer == 0)
     {

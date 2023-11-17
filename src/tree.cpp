@@ -204,7 +204,6 @@ TreeError ReadTextPhrase(char* source, FILE* From)
 
 TreeError CheckNoLoop(Tree tree)
 {
-    printf("|||%d||||\n", tree.size);
     if (2 * tree.size > MAX_SIZE_TREE) {return ERROR_CONST;}   
 
     Node* addresses[MAX_SIZE_TREE] = {};
