@@ -1,74 +1,202 @@
 #include "akinator.h"
 #include "graphic.h"
 
-const char*  lib   =  "lib.txt";
+const char* lib = "lib.txt";
 
-TreeError Interaction()
+
+TreeError MainMenu(Tree* tree)
 {
-    int answer = 0;
-    printf(GREEN_COLOR "Guess[1]" YELLOW_COLOR "Define[2]" BLUE_COLOR "Compare[3]\n" END_COLOR);
-    if (scanf("%d", &answer) != 1) 
-        Interaction();
-    
-    while (getchar() != '\n')   // clean buffer
-        ;
-
-    Tree tree = {};
     TreeError error;
-    FILE*   File = fopen(lib, "r");   
-
-    ReadTree(&tree.root, File, PRE_ORDER);
-    fclose(File);
-    
-    error = CheckNoLoop(tree); 
-    if (error != NO_ERROR)
+    int answer = 0;
+    printf(BOLD_RED_COLOR   "000000000000""      "                                  BLUE_COLOR "1111111111111""          "BOLD_RED_COLOR "2 - exit\n"
+           BOLD_RED_COLOR   "000" GREEN_COLOR "ИГРАТЬ" BOLD_RED_COLOR "000""      " BLUE_COLOR "11" GREEN_COLOR"НАСТРОЙКИ" BLUE_COLOR"11\n"
+           BOLD_RED_COLOR   "000000000000""      "                                  BLUE_COLOR "1111111111111\n" END_COLOR);
+    scanf("%d", &answer);
+    if (answer == 0)
     {
-        DumpErrors(error);
-        exit(1);
+        error = Interaction(tree);
+        if (error != NO_ERROR)
+            return error;
+        
+        return MainMenu(tree);
+    }
+    else if (answer == 1)
+    {
+        error = Parameters(tree);
+        if (error != NO_ERROR)
+            return error;
+
+        MainMenu(tree);
+    }   
+    else if (answer == 2)
+    {
+        DestructorTree(tree);
+        return NO_ERROR;
+    }
+    else
+        return MainMenu(tree);
+
+    return error;
+}
+
+TreeError Interaction(Tree* tree)
+{
+    if (tree->root == NULL)
+    {
+        printf("Выберете библиотеку!\n");
+        return MainMenu(tree);
     }
 
+    Answer answer = GetAnswer(1);
+    TreeError error;
+    
     char define1[MAX_SIZE_ARG] = {};
     char define2[MAX_SIZE_ARG] = {};
     char* temp1;
     char* temp2;
-
-    if (answer == 1)
+    
+    if (answer == GUESS)
     {
-        error = InteractionGuess(&tree);
+        error = InteractionGuess(tree);
     }
-    else if (answer == 2)
+    else if (answer == DEFINE)
     {
         printf("Введите объект, определение которого вы хотите узнать\n");
         temp1 = ReadPhrase(stdin);
-        memcpy(define1, temp1, strlen(temp1));
+        error = InteractionDefine(tree, temp1);
         free(temp1);
-        error = InteractionDefine(&tree, define1);
     }
-    else if (answer == 3)
+    else if (answer == COMPARE)
     {
         printf("Введите объекты, сравнить которые вы хотите\n");
         temp1 = ReadPhrase(stdin);
-        memcpy(define1, temp1, strlen(temp1));
-        free(temp1);
-
         temp2 = ReadPhrase(stdin);
-        memcpy(define2, temp2, strlen(temp2));
-        free(temp2);
-
-        error = InteractionCompare(&tree, define1, define2);
-    }
     
-    GraphicDump(&tree);
-
-    DestructorTree(&tree);
+        error = InteractionCompare(tree, define1, define2);
+    
+        free(temp2);
+        free(temp1);
+    }
 
     return error;
+}
+
+TreeError Parameters(Tree* tree)
+{
+    Answer answer = GetAnswer(2);
+    TreeError error;
+
+    if (answer == BASE)
+        error = SelectBase(tree);
+    else if (answer == GRAPHIC)
+        error = DrawTree(tree);
+
+    return error;
+}
+
+TreeError DrawTree(Tree* tree)
+{
+    if (tree->root == NULL)
+    {
+        printf("Сначала выберети базу, которую хотите увидеть\n");
+        return MainMenu(tree);
+    }
+    else
+    {
+        GraphicDump(tree);
+    }
+    return NO_ERROR;
+}
+
+TreeError SelectBase(Tree* tree)
+{
+    if (tree->root != NULL)
+        DestructorTree(tree);
+    
+    DIR *pDir;
+    struct dirent *pDirent;
+    TreeError error = NO_ERROR;
+
+    pDir = opendir("database");
+    printf("Выберете базу данных, с которой хотите работать\n");
+
+    while ((pDirent = readdir(pDir)) != NULL) 
+    {
+        printf ("[%s]\n", pDirent->d_name);
+    }
+    closedir(pDir);
+
+    char name_base[MAX_SIZE_NAME] = {};
+    scanf("%s", name_base);
+
+    int check = 0;
+
+    pDir = opendir("database");
+
+    while ((pDirent = readdir(pDir)) != NULL) 
+    {
+        if (strcmp(name_base, pDirent->d_name) == 0)
+        {
+            check++;
+        }
+    }
+    closedir (pDir);
+
+    if (check == 1)
+    {
+        char str[MAX_SIZE_NAME] = {};
+        sprintf(str, "database/%s", name_base);
+
+        FILE*   File = fopen(str, "r");
+        if (File == NULL)
+            return FILE_NOT_OPEN;
+
+        ReadTree(tree, &tree->root, File, PRE_ORDER);
+        fclose(File);
+    }
+    else
+    {
+        printf("Нет базы с таким именем\n");
+        return SelectBase(tree);
+    }
+    
+    return error;
+}
+Answer GetAnswer(int x)
+{
+    int answer = 0;
+    if (x == 1)
+    {
+        printf(GREEN_COLOR "Угадывание[1]" YELLOW_COLOR "Определение[2]" BLUE_COLOR "Сравнение[3]\n" END_COLOR);
+        if (scanf("%d", &answer) != 1)
+        {
+            printf("Введите число\n");
+            GetAnswer(x);
+        }
+    }
+    else if (x == 2)
+    {
+        printf("Показать дерево[4] [Выбрать базу данных] [5]\n");
+        scanf("%d", &answer);
+    }
+
+    CleanBuffer();
+
+    if (answer > ENUM_ANSWER_SIZE) 
+    {
+        printf("Введите корректное число\n");
+        GetAnswer(x);
+    }
+    else
+        return (Answer) answer;
+    
+    return (Answer) 0;
 }
 
 TreeError InteractionGuess(Tree* tree)
 {
     int  value =  INT_MAX;
-                                    
+    size_t start_size = tree->size;                     
     TreeError error = GuessObject(tree, &((*tree).root));
     if ((error != NO_ERROR) && (error != EXIT))
     {
@@ -77,12 +205,18 @@ TreeError InteractionGuess(Tree* tree)
         return error;
     }
     
-    printf("Хотите вы записать в библиотеку Ваши добавленные объекты? [1] - да [0] - нет\n");
-    if ((scanf("%d", &value) == 1) && (value == 1))
+    if (start_size != tree->size)
     {
-        FILE* File = fopen(lib, "w");
-        PrintNode(tree->root, File, PRE_ORDER);
-        fclose(File);
+        printf("Хотите вы записать в библиотеку Ваши добавленные объекты? [1] - да [0] - нет\n");
+        if ((scanf("%d", &value) == 1) && (value == 1))
+        {
+            FILE* File = fopen(lib, "w");
+            if (File == NULL)
+                return FILE_NOT_OPEN;
+
+            PrintNode(tree->root, File, PRE_ORDER);
+            fclose(File);
+        }
     }
     
     GraphicDump(tree);
@@ -97,7 +231,7 @@ TreeError InteractionDefine(Tree* tree, char* define)
     ConstructorList(&answer);
 
     TreeError error = ComposePath(tree, tree->root, &answer, define);
-    if (answer.list->num_elem == -1)
+    if (answer.list->num_elem == 0)
     {
         DestructorList(&answer);
         return ELEMENT_NOT_FOUND;
@@ -107,7 +241,7 @@ TreeError InteractionDefine(Tree* tree, char* define)
     
     DestructorList(&answer);
 
-    return NO_ERROR;
+    return error;
 }
 
 TreeError InteractionCompare(Tree* tree, char* define1, char* define2)
@@ -120,18 +254,30 @@ TreeError InteractionCompare(Tree* tree, char* define1, char* define2)
 
 
     TreeError error = ComposePath(tree, tree->root, &answer1, define1);
-    if (answer1.list->num_elem == -1)
+    if (answer1.list->num_elem == 0)
     {
         DestructorList(&answer1);
         DestructorList(&answer2);
         return ELEMENT_NOT_FOUND;
     }
+    if ((error != NO_ERROR) && (error != EXIT))
+    {
+        DestructorTree(tree);
+        DumpErrors(error);
+        return error;
+    }
     error = ComposePath(tree, tree->root, &answer2, define2);
-    if (answer1.list->num_elem == -1)
+    if (answer2.list->num_elem == 0)
     {
         DestructorList(&answer1);
         DestructorList(&answer2);
         return ELEMENT_NOT_FOUND;
+    }
+    if ((error != NO_ERROR) && (error != EXIT))
+    {
+        DestructorTree(tree);
+        DumpErrors(error);
+        return error;
     }
 
     GiveCompare(tree, &answer1, &answer2, define1, define2);
@@ -139,7 +285,7 @@ TreeError InteractionCompare(Tree* tree, char* define1, char* define2)
     DestructorList(&answer1);
     DestructorList(&answer2);
 
-    return error;
+    return NO_ERROR;
 }
 
 TreeError GiveDefine(Tree* tree, Iterator* answer, char* define)
@@ -236,7 +382,6 @@ void GiveSign(Node* current, Iterator* answer, int value)
         if (answer->list->num_elem + 1 != 0)
             printf(",");
     } while (answer->list->num_elem + 1 != 0);
-
 }
 
 TreeError GuessObject(Tree* tree, Node** node)
@@ -252,10 +397,9 @@ TreeError GuessObject(Tree* tree, Node** node)
         if ((*node)->left == NULL)
         {
             printf("Похоже, я угадала!\n");
-            return EXIT;
+            return NO_ERROR;
         }
         error = GuessObject(tree, &(*node)->left);
-        if (error != NO_ERROR) {return error;}
     }
     else if (strcmp(answer, "нет") == 0)
     {
@@ -263,8 +407,7 @@ TreeError GuessObject(Tree* tree, Node** node)
         {
             printf("К сожалению я не знаю, что вы загадали, скажите что это...\n");
 
-            while (getchar() != '\n')   // clean buffer
-                ;
+            CleanBuffer();
 
             (*node)->left = NewNode();
 
@@ -288,18 +431,15 @@ TreeError GuessObject(Tree* tree, Node** node)
             tree->size++;
 
             error = GuessObject(tree, &(tree->root));
-            if (error != NO_ERROR) {return error;}
         }
         error = GuessObject(tree, &(*node)->right);
-        if (error != NO_ERROR) {return error;}
     }
     else 
     {
         printf("Введите корректно\n");
         error = GuessObject(tree, node);
-        if (error != NO_ERROR) {return error;}
     }
-    return NO_ERROR;
+    return error;
 }
 
 TreeError ComposePath(Tree* tree, Node* node, Iterator* answer, char define[])
@@ -320,12 +460,11 @@ TreeError ComposePath(Tree* tree, Node* node, Iterator* answer, char define[])
         if (error != NO_ERROR) {return error;}
     }
 
-    if (strcmp(node->str.data, define) == 0 )
-    {
+    
+    if (strcmp(node->str.data, define) == 0)
         return EXIT;
-    }
     else
-        Pop_Back(answer);
+        if (answer->list->num_elem != 0) {Pop_Back(answer);}
     
     return NO_ERROR;
 }
@@ -333,12 +472,20 @@ TreeError ComposePath(Tree* tree, Node* node, Iterator* answer, char define[])
 char* ReadPhrase(FILE* File)
 {
     size_t arg = 0;
-    char* source;
+    char* source = NULL;
 
     getline(&source, &arg, File);
-    char* ref = (char*) calloc(strlen(source), sizeof(char));
-    memcpy(ref, source, strlen(source) - 1);
-    free(source);
+    size_t lenght = strlen(source);
+    source[lenght] = '\0';
+    source[lenght - 1] = '\0';
 
-    return ref;
+
+    return source;
+}
+
+void CleanBuffer()
+{
+    while (getchar() != '\n')
+        ;
+    
 }

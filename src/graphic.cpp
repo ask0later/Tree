@@ -13,7 +13,7 @@ void GraphicDumpList(Iterator* it)
 
     dtEnd(); // Конец dot-описания графа
 
-    dtRender("Graph.dot");
+    dtRender("Graph.dot", "Graph.jpg", "jpg", false);
 }
 void CreateGraphicNodes(List* list)
 {
@@ -86,7 +86,7 @@ TreeError GraphicDump(Tree* tree)
 
     dtEnd();                                   // Конец dot-описания графа
 
-    dtRender("Graph.dot");
+    dtRender("Graph.dot", "Graph.jpg", "jpg", false);
 
     return NO_ERROR;
 }

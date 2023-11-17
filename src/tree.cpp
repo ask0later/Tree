@@ -120,7 +120,7 @@ void DeleteNode(Node* node)
     return;
 }
 
-TreeError ReadTree(Node** node, FILE* From, Order order_value)
+TreeError ReadTree(Tree* tree, Node** node, FILE* From, Order order_value)
 {
     if (From == NULL) {return FILE_NOT_OPEN;}
     char ptr[MAX_SIZE_ARG] = {};
@@ -135,6 +135,8 @@ TreeError ReadTree(Node** node, FILE* From, Order order_value)
     if (strcmp(source, "(") == 0)
     {
         *node = NewNode();
+        tree->size++;
+
         if (*node == NULL) {return ERROR_ALLOCATION;}
 
         if (order_value == PRE_ORDER)
@@ -143,7 +145,7 @@ TreeError ReadTree(Node** node, FILE* From, Order order_value)
             (*node)->str.data = strdup(source);
         }
         
-        TreeError error = ReadTree(&(*node)->left, From, order_value);
+        TreeError error = ReadTree(tree, &(*node)->left, From, order_value);
         if (error != NO_ERROR)
             return error;
 
@@ -153,7 +155,7 @@ TreeError ReadTree(Node** node, FILE* From, Order order_value)
             (*node)->str.data = strdup(source);
         }
 
-        error = ReadTree(&(*node)->right, From, order_value);
+        error = ReadTree(tree, &(*node)->right, From, order_value);
         if (error != NO_ERROR)
             return error;
         
@@ -185,7 +187,7 @@ TreeError ReadTextPhrase(char* source, FILE* From)
     
     while ((c != 'n') && (c != '('))
     {
-        source[counter] = c; ////
+        source[counter] = c;
         
         c = (char) getc(From);
         counter++;
@@ -202,6 +204,7 @@ TreeError ReadTextPhrase(char* source, FILE* From)
 
 TreeError CheckNoLoop(Tree tree)
 {
+    printf("|||%d||||\n", tree.size);
     if (2 * tree.size > MAX_SIZE_TREE) {return ERROR_CONST;}   
 
     Node* addresses[MAX_SIZE_TREE] = {};

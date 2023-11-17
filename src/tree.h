@@ -9,7 +9,7 @@
 #include "color.h"
 
 
-const size_t MAX_SIZE_TREE = 32;
+const size_t MAX_SIZE_TREE = 64;
 const size_t MAX_SIZE_ARG  = 64;
 typedef char* Elem_t;
 
@@ -33,6 +33,7 @@ enum TreeError
     DEFINE_IS_NULL,
     LIB_IS_EMPTY,
     ELEMENT_NOT_FOUND,
+    INVALID_NAME_BASE,
     EXIT
 };
 
@@ -53,6 +54,7 @@ struct Tree
 {
     Node* root;
     size_t size;
+    //char* name_base;
 };
 
 TreeError ConstructorTree(Tree* tree);
@@ -72,7 +74,7 @@ char*      ReadPhrase(FILE* File);
 void       TextDump(Tree* tree);
 
 TreeError  PrintNode(Node* node, FILE*   To, Order order_value);
-TreeError  ReadTree(Node** node, FILE* From, Order order_value);
+TreeError   ReadTree(Tree* tree, Node** node, FILE* From, Order order_value);
 
 
 

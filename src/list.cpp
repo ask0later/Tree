@@ -123,6 +123,7 @@ void TextDumpList(Iterator* it)
                         list->nodes[0].prev);
 
     printf(YELLOW_COLOR "First free element = %3ld.\n", list->free);
+    printf(GREEN_COLOR  "Numbers of elements = %lu\n", list->num_elem);
     printf("______________________________________\n");
     
     printf(BOLD_RED_COLOR "INDX ");
